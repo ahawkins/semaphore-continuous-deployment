@@ -1,0 +1,145 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "S3Bucket": {
+      "Type": "String",
+      "Description": "S3 Bucket for clojure collector WAR file"
+    },
+    "S3ZipKey": {
+      "Type": "String",
+      "Description": "Path to zip file"
+    },
+    "S3CredentialsKey": {
+      "Type": "String",
+      "Description": "Path to registry credentials file"
+    },
+    "RackEnv": {
+      "Type": "String",
+      "Description": "Value for RACK_ENV and name of this environment"
+    },
+    "HealthCheckPath": {
+      "Type": "String",
+      "Description": "Path for container health check"
+    }
+  },
+  "Description": "Hello World EB application & IAM policies",
+  "Resources": {
+    "ElasticBeanstalkProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/hello-world/",
+        "Roles": [
+          { "Ref": "ElasticBeanstalkRole" }
+        ]
+      }
+    },
+    "ElasticBeanstalkRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "Path": "/hello-world/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebServerTier"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version" : "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": {
+              "Service": [ "ec2.amazonaws.com" ]
+            },
+            "Action": [ "sts:AssumeRole" ]
+          }]
+        },
+        "Policies": [
+          {
+            "PolicyName": "eb-get-registry-credentials",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "s3:GetObject",
+                  "Resource": { "Fn::Join": [ "", [
+                    "arn:aws:s3:::",
+                    { "Ref": "S3Bucket" },
+                    "/",
+                    { "Ref": "S3CredentialsKey" }
+                  ]]}
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "ElasticBeanstalkApplication": {
+      "Type": "AWS::ElasticBeanstalk::Application",
+      "Properties": {
+        "Description": "semaphore-cd-hello"
+      }
+    },
+    "ElasticBeanstalkVersion": {
+      "Type": "AWS::ElasticBeanstalk::ApplicationVersion",
+      "Properties": {
+        "ApplicationName": { "Ref": "ElasticBeanstalkApplication" },
+        "Description": "Source Code",
+        "SourceBundle": {
+          "S3Bucket": { "Ref": "S3Bucket" },
+          "S3Key": { "Ref": "S3ZipKey" }
+        }
+      }
+    },
+    "ElasticBeanstalkConfigurationTemplate": {
+      "Type": "AWS::ElasticBeanstalk::ConfigurationTemplate",
+      "DependsOn": [ "ElasticBeanstalkProfile" ],
+      "Properties": {
+        "Description": "Semaphore CD Configuration Template",
+        "ApplicationName": { "Ref": "ElasticBeanstalkApplication" },
+        "SolutionStackName": "Single Container Docker 1.9 version 2.1.0",
+        "OptionSettings": [
+          {
+            "Namespace": "aws:elasticbeanstalk:environment",
+            "OptionName": "EnvironmentType",
+            "Value": "LoadBalanced"
+          },
+          {
+            "Namespace": "aws:elasticbeanstalk:application",
+            "OptionName": "Application Healthcheck Path",
+            "Value": { "Ref": "HealthCheckPath" }
+          },
+          {
+            "Namespace": "aws:autoscaling:launchconfiguration",
+            "OptionName": "IamInstanceProfile",
+            "Value": { "Fn::GetAtt": [ "ElasticBeanstalkProfile", "Arn" ] }
+          },
+          {
+            "Namespace": "aws:elasticbeanstalk:application:environment",
+            "OptionName": "RACK_ENV",
+            "Value": { "Ref": "RackEnv" }
+          }
+        ]
+      }
+    },
+    "ElasticBeanstalkEnvironment": {
+      "Type": "AWS::ElasticBeanstalk::Environment",
+      "Properties": {
+        "Description": { "Ref": "RackEnv" },
+        "ApplicationName": { "Ref": "ElasticBeanstalkApplication" },
+        "TemplateName": { "Ref": "ElasticBeanstalkConfigurationTemplate" },
+        "VersionLabel": { "Ref": "ElasticBeanstalkVersion" },
+        "Tier": {
+          "Type": "Standard",
+          "Name": "WebServer"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "Application": {
+      "Description": "ElasticBeanstalk Application",
+      "Value": {
+        "Ref": "ElasticBeanstalkApplication"
+      }
+    }
+  }
+}

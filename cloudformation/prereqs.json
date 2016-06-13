@@ -1,0 +1,27 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Pre-reqs for Hello World app",
+  "Parameters": {
+    "Name": {
+      "Type": "String",
+      "Description": "S3 bucket for ElasticBeanstalk source code bundles"
+    }
+  },
+  "Resources": {
+    "Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": { "Fn::Join": [ "-", [
+          { "Ref": "Name" },
+          { "Ref": "AWS::Region" }
+        ]]}
+      }
+    }
+  },
+  "Outputs": {
+    "S3Bucket": {
+      "Description": "Full S3 Bucket name",
+      "Value": { "Ref": "Bucket" }
+    }
+  }
+}

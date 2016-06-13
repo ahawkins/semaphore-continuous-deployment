@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [ -z "$(git diff --shortstat | tail -n 1)" ]; then
+	git rev-parse --short HEAD
+else
+	echo "$(git rev-parse --short HEAD)-dev-$(date '+%s')"
+fi
