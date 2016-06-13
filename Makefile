@@ -3,6 +3,11 @@ TAG:=$(shell git rev-parse --short HEAD)
 IMAGE:=ahawkins/semaphore-cd
 DOCKER:=tmp/docker
 
+.PHONY: check
+check:
+	docker --version > /dev/null
+	ansible --version > /dev/null
+
 Gemfile.lock: Gemfile
 	docker run --rm -v $(CURDIR):/data -w /data $(RUBY_IMAGE) \
 		bundle package --all
