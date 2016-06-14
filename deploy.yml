@@ -37,7 +37,7 @@
       changed_when: False
 
     - name: Create Dockerrun.aws.json for release artifact
-      file:
+      template:
         src: files/Dockerrun.aws.json
         dest: "{{ tmp_dir.stdout }}/Dockerrun.aws.json"
       vars:
