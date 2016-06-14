@@ -1,5 +1,4 @@
 RUBY_IMAGE:=$(shell head -n 1 Dockerfile | cut -d ' ' -f 2)
-TAG:=$(shell git rev-parse --short HEAD)
 IMAGE:=ahawkins/semaphore-cd
 DOCKER:=tmp/docker
 
@@ -34,6 +33,11 @@ test-image: $(DOCKER)
 
 .PHONY: test-ci
 test-ci: test-image test-cloudformation
+
+.PHONY: push
+push:
+	docker tag $(DOCKER_IMAGE) $(UPSTREAM)
+	docker push $(UPSTREAM)
 
 .PHONY: clean
 clean:

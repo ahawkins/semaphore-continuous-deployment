@@ -22,6 +22,10 @@
     "S3Bucket": {
       "Description": "Full S3 Bucket name",
       "Value": { "Ref": "Bucket" }
+    },
+    "AccountID": {
+      "Description": "AWS Account ID",
+      "Value": { "Ref": "AWS::AccountId" }
     }
   }
 }

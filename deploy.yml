@@ -3,58 +3,11 @@
   connection: local
   gather_facts: False
   vars:
-    pre_req_stack_name: semaphore-cd-prereqs
+    prereq_stack_name: semaphore-cd-prereqs
     app_stack_name: semaphore-cd-app
     aws_region: eu-west-1
     bucket_name: "semapore-cd-releases"
   tasks:
-    # - name: Create scratch dir for release artifact
-    #   command: "mktemp -d"
-    #   register: tmp_dir
-    #   changed_when: False
-    #
-    # - name: Make config file
-    #   template:
-    #     dest: "{{ tmp_dir.stdout }}/config.json"
-    #     src: config.json
-    #   changed_when: False
-    #
-    # - name: Prepare src dependencies
-    #   unarchive:
-    #     src: vendor/node_modules.tar.gz
-    #     dest: "{{ tmp_dir.stdout }}"
-    #   changed_when: False
-    #
-    # - name: Prepare src confg files
-    #   shell: "cp src/*.js {{ tmp_dir.stdout }}"
-    #   changed_when: False
-    #
-    # - name: Create release zip file
-    #   command: "zip -r {{ tmp_dir.stdout }}/release.zip ."
-    #   args:
-    #     chdir: "{{ tmp_dir.stdout }}"
-    #   changed_when: False
-    #
-    # - name: Create scratch directory for artifact testing
-    #   command: "mktemp -d"
-    #   changed_when: False
-    #   register: scratch_dir
-    #
-    # - name: Extract release artifact for testing
-    #   unarchive:
-    #     src: "{{ tmp_dir.stdout }}/release.zip"
-    #     dest: "{{ scratch_dir.stdout }}"
-    #   changed_when: False
-    #
-    # - name: Test release zip file
-    #   command: "env RELEASE_DIR={{ scratch_dir.stdout}} bats test/release_test.bats"
-    #   changed_when: False
-    #
-    # - name: Generate artifact hash
-    #   command: "./script/release-tag"
-    #   changed_when: False
-    #   register: artifact_hash
-
     - name: Provision Pre-req stack
       cloudformation:
         state: present
@@ -66,32 +19,11 @@
           Name: "{{ bucket_name }}"
       register: prereqs
 
-    # - name: Upload release zip to S3
-    #   s3:
-    #     region: "{{ aws_region }}"
-    #     mode: put
-    #     src: "{{ tmp_dir.stdout }}/release.zip"
-    #     bucket: "{{ prereqs.stack_outputs.S3Bucket }}"
-    #     object: "lambdas-{{ artifact_hash.stdout }}.zip"
+    - name: Generate artifact hash
+      command: "./script/release-tag"
+      changed_when: False
+      register: artifact_hash
 
-    - name: Provision main stack
-      cloudformation:
-        state: present
-        stack_name: "{{ app_stack_name }}"
-        region: "{{ aws_region }}"
-        disable_rollback: true
-        template: "cloudformation/app.json"
-        template_parameters:
-          S3Bucket: "{{ prereqs.stack_outputs.S3Bucket }}"
-          S3Key: "hello-world-{{ artifact_hash.stdout }}.zip"
-      register: lambdas
-
-    # - name: Test fire lambda
-    #   command: >
-    #     aws lambda invoke
-    #     --function-name {{ lambdas.stack_outputs.PageViewCollector }}
-    #     --invocation-type Event
-    #     --region {{ aws_region }}
-    #     --payload '{}'
-    #     /dev/stdout
-    #   changed_when: False
+    - name: Push Image to ECR
+      command: "make push UPSTREAM={{ preqreqs.stack_outputs.AccountID }}.dkr.ecr.{{ aws_region }}.amazonaws.com/semaphore-cd:{{ artifact_hash.stdout }}"
+      changed_when: False
