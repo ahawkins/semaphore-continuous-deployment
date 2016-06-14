@@ -25,5 +25,5 @@
       register: artifact_hash
 
     - name: Push Image to ECR
-      command: "make push UPSTREAM={{ preqreqs.stack_outputs.AccountID }}.dkr.ecr.{{ aws_region }}.amazonaws.com/semaphore-cd:{{ artifact_hash.stdout }}"
+      command: "make push UPSTREAM={{ prereqs.stack_outputs.AccountID }}.dkr.ecr.{{ aws_region }}.amazonaws.com/semaphore-cd:{{ artifact_hash.stdout }}"
       changed_when: False
