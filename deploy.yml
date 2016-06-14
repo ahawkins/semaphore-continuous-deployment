@@ -3,10 +3,11 @@
   connection: local
   gather_facts: False
   vars:
-    prereq_stack_name: semaphore-cd-prereqs
-    app_stack_name: semaphore-cd-app
     aws_region: eu-west-1
-    bucket_name: "semapore-cd-releases"
+    app_name: "semaphore-cd"
+    prereq_stack_name: "{{ app_name }}-prereqs"
+    app_stack_name: "{{ app_name }}-main"
+    bucket_name: "{{ app_name }}-releases"
   tasks:
     - name: Provision Pre-req stack
       cloudformation:
@@ -16,7 +17,8 @@
         disable_rollback: true
         template: "cloudformation/prereqs.json"
         template_parameters:
-          Name: "{{ bucket_name }}"
+          BucketName: "{{ bucket_name }}"
+          RepositoryName: "{{ app_name }}"
       register: prereqs
 
     - name: Generate artifact hash

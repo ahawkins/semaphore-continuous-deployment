@@ -2,9 +2,13 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Pre-reqs for Hello World app",
   "Parameters": {
-    "Name": {
+    "BucketName": {
       "Type": "String",
-      "Description": "S3 bucket for ElasticBeanstalk source code bundles"
+      "Description": "S3 Bucket name"
+    },
+    "RepositoryName": {
+      "Type": "String",
+      "Description": "ECR Repository name"
     }
   },
   "Resources": {
@@ -12,9 +16,15 @@
       "Type": "AWS::S3::Bucket",
       "Properties": {
         "BucketName": { "Fn::Join": [ "-", [
-          { "Ref": "Name" },
+          { "Ref": "BucketName" },
           { "Ref": "AWS::Region" }
         ]]}
+      }
+    },
+    "Repository": {
+      "Type": "AWS::ECR::Repository",
+      "Properties": {
+        "RepositoryName": { "Ref": "RepositoryName" }
       }
     }
   },
@@ -26,6 +36,10 @@
     "AccountID": {
       "Description": "AWS Account ID",
       "Value": { "Ref": "AWS::AccountId" }
+    },
+    "Repository": {
+      "Description": "ECR Repo",
+      "Value": { "Ref": "Repository" }
     }
   }
 }
