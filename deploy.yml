@@ -40,7 +40,7 @@
       file:
         src: files/Dockerrun.aws.json
         dest: "{{ tmp_dir.stdout }}/Dockerrun.aws.json"
-      variables:
+      vars:
         image: "{{ prereqs.stack_outputs.Repository }}:{{ artifact_hash.stdout }}"
 
     - name: Create release zip file
