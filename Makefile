@@ -36,7 +36,7 @@ test-ci: test-image test-cloudformation
 
 .PHONY: push
 push:
-	docker tag $(DOCKER_IMAGE) $(UPSTREAM)
+	docker tag $(IMAGE) $(UPSTREAM)
 	docker push $(UPSTREAM)
 
 .PHONY: clean
