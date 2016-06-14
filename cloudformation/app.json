@@ -82,7 +82,7 @@
           },
           {
             "Namespace": "aws:elasticbeanstalk:application",
-            "OptionName": "Application Healthcheck Path",
+            "OptionName": "Application Healthcheck URL",
             "Value": { "Ref": "HealthCheckPath" }
           },
           {
