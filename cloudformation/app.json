@@ -38,7 +38,8 @@
       "Properties": {
         "Path": "/hello-world/",
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebServerTier"
+          "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebServerTier",
+          "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
         ],
         "AssumeRolePolicyDocument": {
           "Version" : "2012-10-17",
@@ -50,26 +51,7 @@
             "Action": [ "sts:AssumeRole" ]
           }]
         },
-        "Policies": [
-          {
-            "PolicyName": "eb-get-registry-credentials",
-            "PolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Effect": "Allow",
-                  "Action": "s3:GetObject",
-                  "Resource": { "Fn::Join": [ "", [
-                    "arn:aws:s3:::",
-                    { "Ref": "S3Bucket" },
-                    "/",
-                    { "Ref": "S3CredentialsKey" }
-                  ]]}
-                }
-              ]
-            }
-          }
-        ]
+        "Policies": [ ]
       }
     },
     "ElasticBeanstalkApplication": {
