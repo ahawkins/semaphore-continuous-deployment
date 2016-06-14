@@ -9,10 +9,6 @@
       "Type": "String",
       "Description": "Path to zip file"
     },
-    "S3CredentialsKey": {
-      "Type": "String",
-      "Description": "Path to registry credentials file"
-    },
     "RackEnv": {
       "Type": "String",
       "Description": "Value for RACK_ENV and name of this environment"

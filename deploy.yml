@@ -66,6 +66,6 @@
         template: "cloudformation/app.json"
         template_parameters:
           S3Bucket: "{{ prereqs.stack_outputs.S3Bucket }}"
-          S3Key: "{{ app_name }}-{{ artifact_hash.stdout }}.zip"
+          S3ZipKey: "{{ app_name }}-{{ artifact_hash.stdout }}.zip"
           RackEnv: "{{ environment_name }}"
           HealthCheckPath: "/ping"
