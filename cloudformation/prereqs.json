@@ -33,13 +33,20 @@
       "Description": "Full S3 Bucket name",
       "Value": { "Ref": "Bucket" }
     },
-    "AccountID": {
-      "Description": "AWS Account ID",
-      "Value": { "Ref": "AWS::AccountId" }
-    },
     "Repository": {
       "Description": "ECR Repo",
-      "Value": { "Ref": "Repository" }
+      "Value": { "Fn::Join": [ "/", [
+        {
+          "Fn::Join": [ ".", [
+            { "Ref": "AWS::AccountId" },
+            "dkr",
+            "ecr",
+            { "Ref": "AWS::Region" },
+            "amazonaws.com"
+          ]]
+        },
+        { "Ref": "Repository" }
+      ]]}
     }
   }
 }
