@@ -34,7 +34,7 @@
       "Properties": {
         "Path": "/hello-world/",
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebServerTier",
+          "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier",
           "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
         ],
         "AssumeRolePolicyDocument": {
