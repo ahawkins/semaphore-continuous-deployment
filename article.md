@@ -548,4 +548,4 @@ continuous deployment.
 [cf]: placeholder
 [cloudformation]: placeholder
 [ruby image]: placeholder
-[source]: placeholder
+[source]: https://github.com/ahawkins/semaphore-continuous-deployment
