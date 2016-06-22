@@ -544,8 +544,12 @@ provisioning can be a bit slow but it will work. Then open the
 ElasticBeanstalk URL and you should see "Hello World". Welcome to
 continuous deployment.
 
-[eb]: placeholder
-[cf]: placeholder
-[cloudformation]: placeholder
-[ruby image]: placeholder
+[ecr]: https://aws.amazon.com/ecr/
+[eb]: https://aws.amazon.com/elasticbeanstalk/
+[cf]: https://aws.amazon.com/cloudformation/
+[ansible]: https://www.ansible.com/
+[terraform]: http://www.terraform.io/
+[ruby image]: https://hub.docker.com/_/ruby/
 [source]: https://github.com/ahawkins/semaphore-continuous-deployment
+[ruby-docker-tdd]: http://blog.slashdeploy.com/2016/05/02/docker_and_ruby_for_tdd_and_deployment/
+[sinatra]: http://www.sinatrarb.com/
