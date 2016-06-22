@@ -4,7 +4,7 @@ You've built some docker images and made something locally. Now it's
 time to go to production--and you're stuck. This is not uncommon. The
 docker for development environments story is well developed. The
 community is still writing the production story. This tutorial will
-take from a greenfield web project to applicatoin running in
+take from a greenfield web project to application running in
 production. The structure looks like:
 
 1. Build and push docker images with `make`
@@ -12,7 +12,7 @@ production. The structure looks like:
 1. Pushing image to [AWS ECR][ecr]
 1. Bootstrapping a docker [AWS ElasticBeanstalk][eb] application with
 	 [AWS Cloudformation][cf].
-1. Coordinate infrasturcture & application deployment with [ansible][]
+1. Coordinate infrastructure & application deployment with [ansible][]
 
 You may be thinking, "hey, this seems like a lot of tools?" You're
 onto something. There are multiple moving parts. That's what it
@@ -27,7 +27,7 @@ deploy docker containers to production. They roughly fall into three
 categories:
 
 1. Scheduling Clusters
-	* Mesos, Kubernetes, EC2, Docker Universal Control Plane, and
+	* DCOS, Mesos, Kubernetes, ECS, Docker Universal Control Plane, and
 		others. These systems create a resource pool from a varying number
 		of machines. Users can create tasks/jobs (naming varies from
 		system to system) and the cluster will schedule it to run. Some
@@ -61,13 +61,13 @@ java, python, go, and probably a few other things. It supports web
 applications and cron style worker system. ElasticBeanstalk has an
 interesting value proposition. First, it's AWS. Thus anyone teams
 already using AWS can integrate it into their public or internal
-infrastructure. Second, it's autocaling and generally supports the
+infrastructure. Second, it's autoscaling and generally supports the
 most popular platforms in the industry with little effort. Third, it's
 easy enough to deploy a single docker container too. Provide the
 config file and AWS will sort the rest out. Also it gives the tutorial
 a reason to provision infrastructure.
 
-Production infrastructure has to come from somwhere. AWS is the
+Production infrastructure has to come from somewhere. AWS is the
 default choice for advanced use cases. Other cloud providers are
 playing catch up here. CloudFormation is the natural choice to
 provision all the AWS resources. It's first partner and will generally
@@ -85,12 +85,12 @@ I do my job, you'll feel like a pro by the end.
 ## Step 1: Build & Test a Docker Image
 
 I'll use a dead simple Ruby web application built with [Sinatra][].
-The langauge or framework is not specifically relevant for this
+The language or framework is not specifically relevant for this
 tutorial. This is just to demonstrate building and testing a docker
-image. I could use a prexisiting "hello world" type image, but that
+image. I could use a pre-existing "hello world" type image, but that
 would be a cop out. This is a greenfield to production tutorial!
 
-The `Makefile` follows my own best pratices for working with [Ruby and
+The `Makefile` follows my own best practices for working with [Ruby and
 Docker][ruby-docker-tdd]. The tl;dr here is:
 
 * `Gemfile` lists all the application dependencies
@@ -102,8 +102,8 @@ Docker][ruby-docker-tdd]. The tl;dr here is:
 * `src/` contains relevant ruby source files
 * `test/` contains the test files
 
-Here are the snippets from the relevant files. The [complete source][]
-is available as well. First the `Dockerfile`.
+Here are the snippets from the relevant files. The [complete
+source][source] is available as well. First the `Dockerfile`.
 
 	FROM ruby:2.3
 
@@ -192,7 +192,7 @@ these as "release". Right now we need two things from AWS:
 Enter Ansible and CloudFormation! We'll use CloudFormation to create
 the previously mentioned resources. Ansible allows us to deploy the
 cloudformation stack. This is powerful because Ansible automatically
-creates or updates the CloudFormation stacks. Whoa! Continous
+creates or updates the CloudFormation stacks. Whoa! Continuous
 infrastructure deployment. I'll start by providing the CloudFormation
 template but I won't go completely in-depth. Plenty of other resources
 are better for that.
@@ -258,15 +258,15 @@ I do want to call out a few things specifically. First there are two
 input parameters and two output parameters. ElasticBeanstalk requires
 a bucket in a specific region. The templates take the bucket parameter
 and appends the region to it. Second, it outputs the complete ECR
-registry url. You must know your AWS account ID to use ECR. How many
+registry URL. You must know your AWS account ID to use ECR. How many
 of you know that off the top of your head? CloudFormation does. We can
 use that value to output the full registry endpoint. The value can be
-used progrmatically from within Ansible. Time to move onto the Ansible
+used programmatically from within Ansible. Time to move onto the Ansible
 playbook.
 
 Ansible models things with Playbooks. Playbooks contain tasks. Tasks
 use modules to do whatever is required. Playbooks are YML files. We'll
-build up the deploy plabook as we go. The first step is to deploy the
+build up the deploy playbook as we go. The first step is to deploy the
 previously mentioned CloudFormation stack. The next step is to use the
 outputs to push the image to our registry.
 
@@ -368,7 +368,7 @@ Let's work backwards from the CloudFormation template
 		"Parameters": {
 			"S3Bucket": {
 				"Type": "String",
-				"Description": "S3 Bucket for clojure collector WAR file"
+				"Description": "S3 Bucket holding source code bundles"
 			},
 			"S3ZipKey": {
 				"Type": "String",
@@ -488,7 +488,7 @@ Let's work backwards from the CloudFormation template
 	}
 
 This templates creates the ElasticBeanstalk application and properly
-configured enviornment. It uses an IAM Instance Profile to grant
+configured environment. It uses an IAM Instance Profile to grant
 appropriate permissions to the instances. Finally it outputs the
 complete URL to the application. This can be opened in your browser.
 
