@@ -3,7 +3,7 @@
   "Parameters": {
     "S3Bucket": {
       "Type": "String",
-      "Description": "S3 Bucket for clojure collector WAR file"
+      "Description": "S3 Bucket containing zip file"
     },
     "S3ZipKey": {
       "Type": "String",
